@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?xml-stylesheet href="chrome://global/skin/"?>
+<?xml-stylesheet href="chrome://preciseclearhistory/content/preciseclearhistoryOverlay.css"?>
+
+<!DOCTYPE overlay SYSTEM "chrome://preciseclearhistory/locale/preciseclearhistory.dtd">
+<overlay id="preciseclearhistoryPlacesOverlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+	<toolbar id="placesToolbar">
+		<label value="test" insertafter="placesMenu"/>
+	</toolbar>
+</overlay>

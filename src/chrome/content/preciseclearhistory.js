@@ -3,6 +3,7 @@ gSanitizePromptDialog.___selectByTimespan = gSanitizePromptDialog.selectByTimesp
 gSanitizePromptDialog.___updatePrefs = gSanitizePromptDialog.updatePrefs;
 gSanitizePromptDialog.___sanitize = gSanitizePromptDialog.sanitize;
 Sanitizer.___getClearRange = Sanitizer.getClearRange;
+Sanitizer.___getClearRange = Sanitizer.getClearRange;
 
 gSanitizePromptDialog.preciseBox = null;
 gSanitizePromptDialog._prefs = null;
@@ -85,6 +86,17 @@ gSanitizePromptDialog.___init = function()
 		this.preciseBox.hidden = true;
 
 	this._precisePreset = 1;
+	let sanitizeItemList = document.querySelectorAll("#itemList > [preference]");
+	for (let i = 0; i < sanitizeItemList.length; i++)
+	{
+		let prefItem = sanitizeItemList[i];
+		if (prefItem.getAttribute("preference") == "privacy.cpd.history")
+		{
+			prefItem.parentNode.insertBefore(document.getElementById("itemSession"), prefItem.nextSibling);
+			break;
+		}
+	}
+	document.getElementById("itemList").setAttribute("rows", parseInt(document.getElementById("itemList").getAttribute("rows")) + 1);
 }
 
 gSanitizePromptDialog.precisePreset = function(obj)
@@ -270,5 +282,47 @@ Sanitizer.getClearRange = function (ts)
 	}
 	return this.___getClearRange(ts);
 }
+
+Sanitizer.prototype.items.history.clear = function ()
+{
+	var globalHistory = Components.classes["@mozilla.org/browser/global-history;2"]
+																.getService(Components.interfaces.nsIBrowserHistory);
+	if (this.range)
+		globalHistory.removeVisitsByTimeframe(this.range[0], this.range[1]);
+	else
+		globalHistory.removeAllPages();
+
+/*
+	try {
+		var os = Components.classes["@mozilla.org/observer-service;1"]
+											 .getService(Components.interfaces.nsIObserverService);
+		os.notifyObservers(null, "browser:purge-session-history", "");
+	}
+	catch (e) { }
+*/
+
+	// Clear last URL of the Open Web Location dialog
+	var prefs = Components.classes["@mozilla.org/preferences-service;1"]
+												.getService(Components.interfaces.nsIPrefBranch2);
+	try {
+		prefs.clearUserPref("general.open_location.last_url");
+	}
+	catch (e) { }
+}
+Sanitizer.prototype.items.historysession = {
+	clear: function ()
+	{
+		try {
+			var os = Components.classes["@mozilla.org/observer-service;1"]
+												 .getService(Components.interfaces.nsIObserverService);
+			os.notifyObservers(null, "browser:purge-session-history", "");
+		}
+		catch (e) { }
+	},
+	get canClear()
+	{
+		return true;
+	}
+};
 
 window.addEventListener("load", gSanitizePromptDialog.preciseLoad, false);

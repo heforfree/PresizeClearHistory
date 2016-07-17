@@ -4,12 +4,12 @@
 <?xml-stylesheet href="chrome://preciseclearhistory/content/preciseclearhistoryOverlay.css"?>
 
 <!DOCTYPE prefwindow [
-  <!ENTITY % brandDTD SYSTEM "chrome://branding/locale/brand.dtd">
-  <!ENTITY % sanitizeDTD SYSTEM "chrome://browser/locale/sanitize.dtd">
-  <!ENTITY % preciseDTD SYSTEM "chrome://preciseclearhistory/locale/preciseclearhistory.dtd">
-  %brandDTD;
-  %sanitizeDTD;
-  %preciseDTD;
+	<!ENTITY % brandDTD SYSTEM "chrome://branding/locale/brand.dtd">
+	<!ENTITY % sanitizeDTD SYSTEM "chrome://browser/locale/sanitize.dtd">
+	<!ENTITY % preciseDTD SYSTEM "chrome://preciseclearhistory/locale/preciseclearhistory.dtd">
+	%brandDTD;
+	%sanitizeDTD;
+	%preciseDTD;
 ]>
 <overlay id="preciseclearhistoryOverlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 	<prefpane id="SanitizeDialogPane"
@@ -70,4 +70,15 @@
 		<menuitem label="&precise.menu.after;" value="106" position="7"/>
 		<menuitem label="&precise.menu.between;" value="107" position="8"/>
 	</menupopup>
+	<preferences id="sanitizePreferences">
+		<preference id="privacy.cpd.historysession" name="privacy.cpd.historysession" type="bool"/>
+	</preferences>
+	<listbox id="itemList">
+		<listitem id="itemSession"
+							label="&precise.list.session;"
+							type="checkbox"
+							tooltiptext="&precise.list.session.tooltip;"
+							preference="privacy.cpd.historysession"
+							onsyncfrompreference="return gSanitizePromptDialog.onReadGeneric();"/>
+	</listbox>
 </overlay>

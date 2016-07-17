@@ -8,3 +8,5 @@
 <!ENTITY precise.quick.last7days "Last 7 days">
 <!ENTITY precise.quick.last20days "Last 20 days">
 <!ENTITY precise.quick.last30days "Last 30 days">
+<!ENTITY precise.list.session "All session browsing history">
+<!ENTITY precise.list.session.tooltip "All current session history will be erased, regardless of chosen time frame.">
