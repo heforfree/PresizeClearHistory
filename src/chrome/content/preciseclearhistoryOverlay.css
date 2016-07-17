@@ -36,3 +36,7 @@
   list-style-image: url("chrome://global/skin/icons/information-16.png");
   -moz-image-region: auto;
 }
+#sanitizePreciseXHours_box
+{
+	padding-left: 2.5em;
+}

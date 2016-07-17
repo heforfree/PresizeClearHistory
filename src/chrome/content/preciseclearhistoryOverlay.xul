@@ -18,15 +18,21 @@
 	>
 		<script type="application/javascript" src="chrome://preciseclearhistory/content/preciseclearhistory.js"/>
 		<popupset>
-			<menupopup id="preciseQuickMenu" position="after_pointer">
+			<menupopup id="preciseQuickMenu" position="after_pointer" ignorekeys="true">
 				<menuitem label="&precise.quick.now;" value="0" oncommand="gSanitizePromptDialog.precisePreset(this)"/>
 				<menuitem label="&clearTimeDuration.lastHour;" value="3600000" oncommand="gSanitizePromptDialog.precisePreset(this)"/>
 				<menuitem label="&clearTimeDuration.last2Hours;" value="7200000" oncommand="gSanitizePromptDialog.precisePreset(this)"/>
 				<menuitem label="&clearTimeDuration.last4Hours;" value="14400000" oncommand="gSanitizePromptDialog.precisePreset(this)"/>
+				<hbox align="center">
+					<menuitem id="sanitizePreciseXHours" label="&precise.lastXHours;" value="0" oncommand="gSanitizePromptDialog.precisePreset(this)"/>
+					<textbox type="number" value="24" min="1" size="5" id="sanitizePreciseXHoursValue" oncommand="gSanitizePromptDialog.preciseXHours(this)" persist="value"/>
+					<label value="&precise.hours;"/>
+				</hbox>
 				<menuitem label="&clearTimeDuration.today;" value="4" oncommand="gSanitizePromptDialog.precisePreset(this)"/>
 				<menuitem label="&precise.quick.month;" value="105" oncommand="gSanitizePromptDialog.precisePreset(this)"/>
 				<menuitem label="&precise.quick.last7days;" value="604800000" oncommand="gSanitizePromptDialog.precisePreset(this)"/>
 				<menuitem label="&precise.quick.last20days;" value="1728000000" oncommand="gSanitizePromptDialog.precisePreset(this)"/>
+				<menuitem label="&precise.quick.last30days;" value="2592000000" oncommand="gSanitizePromptDialog.precisePreset(this)"/>
 				<menuitem label="&precise.quick.last30days;" value="2592000000" oncommand="gSanitizePromptDialog.precisePreset(this)"/>
 			</menupopup>
 		</popupset>

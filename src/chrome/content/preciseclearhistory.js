@@ -97,6 +97,7 @@ gSanitizePromptDialog.___init = function()
 		}
 	}
 	document.getElementById("itemList").setAttribute("rows", parseInt(document.getElementById("itemList").getAttribute("rows")) + 1);
+	this.preciseXHours()
 }
 
 gSanitizePromptDialog.precisePreset = function(obj)
@@ -191,6 +192,15 @@ gSanitizePromptDialog.preciseShowDate = function(id, date)
 {
 	document.getElementById("sanitizePreciseDate"+id).dateValue = date;
 	document.getElementById("sanitizePreciseTime"+id).dateValue = date;
+}
+
+gSanitizePromptDialog.preciseXHours = function()
+{
+	let textbox = document.getElementById("sanitizePreciseXHoursValue"),
+			menuitem = document.getElementById("sanitizePreciseXHours");
+
+	menuitem.value = textbox.value * 3600000;
+	textbox.setAttribute("value", textbox.value)
 }
 
 gSanitizePromptDialog.selectByTimespan = function()

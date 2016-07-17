@@ -1,5 +1,7 @@
 <!ENTITY precise.title "Clear history with specific date">
 <!ENTITY precise.wait "Please wait">
+<!ENTITY precise.lastXHours "Last">
+<!ENTITY precise.hours "Hours">
 <!ENTITY precise.menu.before "Before specific date">
 <!ENTITY precise.menu.after "After specific date">
 <!ENTITY precise.menu.between "Between specific dates">
