@@ -1,0 +1,4 @@
+content		preciseclearhistory				chrome/content/
+locale		preciseclearhistory	en-US	chrome/locale/en-US/
+
+overlay	chrome://browser/content/sanitize.xul	chrome://preciseclearhistory/content/preciseclearhistoryOverlay.xul

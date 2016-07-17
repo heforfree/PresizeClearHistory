@@ -1,0 +1,8 @@
+@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
+
+#sanitizePreciseBox {
+	background-color: Window;
+	border: 1px solid ThreeDDarkShadow;
+	-moz-border-radius: 5px;
+	padding: 2px;
+}

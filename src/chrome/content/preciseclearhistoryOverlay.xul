@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+
+<?xml-stylesheet href="chrome://browser/skin/sanitizeDialog.css"?>
+
+
+<?xml-stylesheet href="chrome://browser/content/sanitizeDialog.css"?>
+<?xml-stylesheet href="chrome://preciseclearhistory/content/preciseclearhistoryOverlay.css"?>
+
+<!DOCTYPE overlay SYSTEM "chrome://preciseclearhistory/locale/preciseclearhistory.dtd">
+
+<overlay id="preciseclearhistoryOverlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+	<script type="application/javascript" src="chrome://preciseclearhistory/content/preciseclearhistory.js"/>
+	<preferences id="nonItemPreferences">
+		<preference id="precise.type"	name="extensions.preciseclearhistory.type"	type="int"/>
+	</preferences>
+	<prefwindow id="SanitizeDialog"
+							precisetitle="&precise.title;"
+	>
+		<vbox id="sanitizePreciseBox">
+			<spacer flex="1"/>
+				<hbox align="center">
+					<menulist id="sanitizePreciseType"
+										preference="precise.type"
+					>
+						<menupopup id="sanitizePrecisePopup">
+							<menuitem label="&precise.menu.before;" value="1"/>
+							<menuitem label="&precise.menu.after;" value="2"/>
+							<menuitem label="&precise.menu.between;" value="3"/>
+						</menupopup>
+					</menulist>
+					<vbox>
+						<hbox id="sanitizePreciseDateBox1">
+							<datepicker id="sanitizePreciseDate1" type="popup" value="2000-01-01" />
+							<timepicker id="sanitizePreciseTime1" value="00:00:00" />
+						</hbox>
+						<separator class="thin" id="sep"/>
+						<hbox id="sanitizePreciseDateBox2">
+							<datepicker id="sanitizePreciseDate2" type="popup" value="2000-01-01" />
+							<timepicker id="sanitizePreciseTime2" value="00:00:00" />
+						</hbox>
+					</vbox>
+				</hbox>
+			<spacer flex="1"/>
+		</vbox>
+	</prefwindow>
+	<menupopup id="sanitizeDurationPopup">
+		<menuseparator/>
+		<menuitem label="&precise.menu;" value="105"/>
+	</menupopup>
+</overlay>

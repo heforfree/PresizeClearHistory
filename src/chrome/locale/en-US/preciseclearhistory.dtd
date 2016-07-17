@@ -1,0 +1,5 @@
+<!ENTITY precise.title "Clear history with specific date">
+<!ENTITY precise.menu "Specific date">
+<!ENTITY precise.menu.before "Before">
+<!ENTITY precise.menu.after "After">
+<!ENTITY precise.menu.between "Between">
