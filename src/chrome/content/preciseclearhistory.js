@@ -268,7 +268,7 @@ Sanitizer.getClearRange = function (ts)
 		}
 		return [(d1.valueOf() * 1000), (d2.valueOf() * 1000)];
 	}
-	this.___getClearRange(ts);
+	return this.___getClearRange(ts);
 }
 
 window.addEventListener("load", gSanitizePromptDialog.preciseLoad, false);
