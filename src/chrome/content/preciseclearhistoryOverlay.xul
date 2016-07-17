@@ -1,52 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
-
-<?xml-stylesheet href="chrome://browser/skin/sanitizeDialog.css"?>
-
-
-<?xml-stylesheet href="chrome://browser/content/sanitizeDialog.css"?>
+<?xml-stylesheet href="chrome://global/skin/"?>
 <?xml-stylesheet href="chrome://preciseclearhistory/content/preciseclearhistoryOverlay.css"?>
 
-<!DOCTYPE overlay SYSTEM "chrome://preciseclearhistory/locale/preciseclearhistory.dtd">
-
+<!DOCTYPE prefwindow [
+  <!ENTITY % brandDTD SYSTEM "chrome://branding/locale/brand.dtd">
+  <!ENTITY % sanitizeDTD SYSTEM "chrome://browser/locale/sanitize.dtd">
+  <!ENTITY % preciseDTD SYSTEM "chrome://preciseclearhistory/locale/preciseclearhistory.dtd">
+  %brandDTD;
+  %sanitizeDTD;
+  %preciseDTD;
+]>
 <overlay id="preciseclearhistoryOverlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
-	<script type="application/javascript" src="chrome://preciseclearhistory/content/preciseclearhistory.js"/>
-	<preferences id="nonItemPreferences">
-		<preference id="precise.type"	name="extensions.preciseclearhistory.type"	type="int"/>
-	</preferences>
-	<prefwindow id="SanitizeDialog"
-							precisetitle="&precise.title;"
+	<prefpane id="SanitizeDialogPane"
+						precisetitle="&precise.title;"
+						precisewait="&precise.wait;"
 	>
-		<vbox id="sanitizePreciseBox">
-			<spacer flex="1"/>
-				<hbox align="center">
-					<menulist id="sanitizePreciseType"
-										preference="precise.type"
-					>
-						<menupopup id="sanitizePrecisePopup">
-							<menuitem label="&precise.menu.before;" value="1"/>
-							<menuitem label="&precise.menu.after;" value="2"/>
-							<menuitem label="&precise.menu.between;" value="3"/>
-						</menupopup>
-					</menulist>
-					<vbox>
-						<hbox id="sanitizePreciseDateBox1">
-							<datepicker id="sanitizePreciseDate1" type="popup" value="2000-01-01" />
-							<timepicker id="sanitizePreciseTime1" value="00:00:00" />
-						</hbox>
-						<separator class="thin" id="sep"/>
-						<hbox id="sanitizePreciseDateBox2">
-							<datepicker id="sanitizePreciseDate2" type="popup" value="2000-01-01" />
-							<timepicker id="sanitizePreciseTime2" value="00:00:00" />
-						</hbox>
-					</vbox>
+		<script type="application/javascript" src="chrome://preciseclearhistory/content/preciseclearhistory.js"/>
+		<popupset>
+			<menupopup id="preciseQuickMenu" position="after_pointer">
+				<menuitem label="&precise.quick.now;" value="0" oncommand="gSanitizePromptDialog.precisePreset(this)"/>
+				<menuitem label="&clearTimeDuration.lastHour;" value="3600000" oncommand="gSanitizePromptDialog.precisePreset(this)"/>
+				<menuitem label="&clearTimeDuration.last2Hours;" value="7200000" oncommand="gSanitizePromptDialog.precisePreset(this)"/>
+				<menuitem label="&clearTimeDuration.last4Hours;" value="14400000" oncommand="gSanitizePromptDialog.precisePreset(this)"/>
+				<menuitem label="&clearTimeDuration.today;" value="4" oncommand="gSanitizePromptDialog.precisePreset(this)"/>
+				<menuitem label="&precise.quick.month;" value="105" oncommand="gSanitizePromptDialog.precisePreset(this)"/>
+				<menuitem label="&precise.quick.last7days;" value="604800000" oncommand="gSanitizePromptDialog.precisePreset(this)"/>
+				<menuitem label="&precise.quick.last20days;" value="1728000000" oncommand="gSanitizePromptDialog.precisePreset(this)"/>
+				<menuitem label="&precise.quick.last30days;" value="2592000000" oncommand="gSanitizePromptDialog.precisePreset(this)"/>
+			</menupopup>
+		</popupset>
+		<vbox id="sanitizePreciseBox" flex="1" align="center" pack="center" insertbefore="sanitizeEverythingWarningBox">
+			<hbox>
+				<vbox pack="center">
+					<button type="image" class="preset" popup="preciseQuickMenu" oncommand="gSanitizePromptDialog._precisePreset=1" />
+				</vbox>
+				<hbox id="sanitizePreciseDateBox1">
+					<datepicker id="sanitizePreciseDate1" type="popup" />
+					<timepicker id="sanitizePreciseTime1" />
 				</hbox>
-			<spacer flex="1"/>
+				<hbox id="sanitizePreciseDateBox2">
+					<datepicker id="sanitizePreciseDate2" type="popup" />
+					<timepicker id="sanitizePreciseTime2" />
+				</hbox>
+				<hbox id="sanitizePreciseDateBox3">
+					<datepicker id="sanitizePreciseDate3" type="popup" />
+					<timepicker id="sanitizePreciseTime3" />
+				</hbox>
+			</hbox>
+			<hbox>
+				<vbox id="sanitizePreciseDateBox4">
+					<separator class="thin"/>
+					<hbox>
+						<vbox pack="center">
+							<button type="image" class="preset" popup="preciseQuickMenu" oncommand="gSanitizePromptDialog._precisePreset=0" />
+						</vbox>
+						<hbox>
+							<datepicker id="sanitizePreciseDate4" type="popup" />
+							<timepicker id="sanitizePreciseTime4" />
+						</hbox>
+					</hbox>
+				</vbox>
+			</hbox>
 		</vbox>
-	</prefwindow>
+	</prefpane>
 	<menupopup id="sanitizeDurationPopup">
-		<menuseparator/>
-		<menuitem label="&precise.menu;" value="105"/>
+		<menuseparator position="5"/>
+		<menuitem label="&precise.menu.before;" value="105" position="6"/>
+		<menuitem label="&precise.menu.after;" value="106" position="7"/>
+		<menuitem label="&precise.menu.between;" value="107" position="8"/>
 	</menupopup>
 </overlay>

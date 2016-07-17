@@ -1,9 +1,14 @@
-gSanitizePromptDialog._selectByTimespan = gSanitizePromptDialog.selectByTimespan;
-gSanitizePromptDialog._updatePrefs = gSanitizePromptDialog.updatePrefs;
+//backup original functions because we'll override them with new code (or there is a better method to acomplish this?)
+gSanitizePromptDialog.___selectByTimespan = gSanitizePromptDialog.selectByTimespan;
+gSanitizePromptDialog.___updatePrefs = gSanitizePromptDialog.updatePrefs;
+gSanitizePromptDialog.___sanitize = gSanitizePromptDialog.sanitize;
+Sanitizer.___getClearRange = Sanitizer.getClearRange;
+
 gSanitizePromptDialog.preciseBox = null;
 gSanitizePromptDialog._prefs = null;
-Sanitizer._getClearRange = Sanitizer.getClearRange;
-Sanitizer.TIMESPAN_PRECISE = 105;
+Sanitizer.TIMESPAN_PRECISE_BEFORE = 105;
+Sanitizer.TIMESPAN_PRECISE_AFTER= 106;
+Sanitizer.TIMESPAN_PRECISE_BETWEEN = 107;
 
 gSanitizePromptDialog.__defineGetter__("prefs", function()
 {
@@ -13,100 +18,164 @@ gSanitizePromptDialog.__defineGetter__("prefs", function()
 																		 .getBranch("extensions.preciseclearhistory.");
 });
 
-gSanitizePromptDialog.load = function()
+gSanitizePromptDialog.isPrecise = function(ts)
 {
-	gSanitizePromptDialog._init();
+	var ts = ts || this.selectedTimespan;
+	return ts === Sanitizer.TIMESPAN_PRECISE_BEFORE
+					|| this.selectedTimespan === Sanitizer.TIMESPAN_PRECISE_AFTER
+					|| this.selectedTimespan === Sanitizer.TIMESPAN_PRECISE_BETWEEN;
+};
+
+gSanitizePromptDialog.preciseLoad = function()
+{
+	gSanitizePromptDialog.___init();
 }
-window.addEventListener("load", gSanitizePromptDialog.load, false);
 
-gSanitizePromptDialog._init = function()
+gSanitizePromptDialog.___init = function()
 {
-	this.preciseBox = document.importNode(document.getElementById("sanitizePreciseBox"), true);
-	document.getElementById("sanitizePreciseBox").parentNode.removeChild(document.getElementById("sanitizePreciseBox"));
-	this.warningBox.parentNode.insertBefore(this.preciseBox, this.warningBox);
-	this._lastSelected = null;
-	this.typeBox = document.getElementById("sanitizePreciseType");
-	var type = parseInt(this.typeBox.value);
-	this._date1 = parseInt(this.prefs.getCharPref("date1")) *1000;
-	if (this._date1)
+	this.preciseBox = document.getElementById("sanitizePreciseBox");
+	this._preciseLastSelected = null;
+	this._preciseDate1 = parseInt(this.prefs.getCharPref("date1")) *1000;
+	if (this._preciseDate1)
 	{
-		this._date1 = new Date(this._date1);
-		if (isNaN(this._date1))
-			this._date1 = null;
+		this._preciseDate1 = new Date(this._preciseDate1);
+		if (isNaN(this._preciseDate1))
+			this._preciseDate1 = null;
 	}
-	if (!this._date1)
-		if (type == 3)
-			this._date1 = new Date(2000, 0, 1, 0, 0,0);
-		else
-			this._date1 = new Date();
+	if (!this._preciseDate1)
+			this._preciseDate1 = new Date();
 
-	this._date2 = parseInt(this.prefs.getCharPref("date2")) *1000;
-	if (this._date2)
+	this._preciseDate2 = parseInt(this.prefs.getCharPref("date2")) *1000;
+	if (this._preciseDate2)
 	{
-		this._date2 = new Date(this._date2);
-		if (isNaN(this._date2))
-			this._date2 = new Date();
+		this._preciseDate2 = new Date(this._preciseDate2);
+		if (isNaN(this._preciseDate2))
+			this._preciseDate2 = new Date();
 	}
 	else
-		this._date2 = new Date();
+		this._preciseDate2 = new Date();
 
-	this.showDate(1, this._date1);
-	this.showDate(2, this._date2);
-	this.preciseBoxShow(false, type);
+	this._preciseDate3 = parseInt(this.prefs.getCharPref("date3")) *1000;
+	if (this._preciseDate3)
+	{
+		this._preciseDate3 = new Date(this._preciseDate3);
+		if (isNaN(this._preciseDate3))
+			this._preciseDate3 = null;
+	}
+	if (!this._preciseDate3)
+			this._preciseDate3 = new Date(2000, 0, 1, 0, 0, 0);
 
-	if (this.selectedTimespan !== Sanitizer.TIMESPAN_PRECISE)
+	this._preciseDate4 = parseInt(this.prefs.getCharPref("date4")) *1000;
+	if (this._preciseDate4)
+	{
+		this._preciseDate4 = new Date(this._preciseDate4);
+		if (isNaN(this._preciseDate4))
+			this._preciseDate4 = null;
+	}
+	if (!this._preciseDate4)
+			this._preciseDate4 = new Date();
+
+	this.preciseShowDate(1, this._preciseDate1);
+	this.preciseShowDate(2, this._preciseDate2);
+	this.preciseShowDate(3, this._preciseDate3);
+	this.preciseShowDate(4, this._preciseDate4);
+	this.preciseBoxShow(false);
+
+	if (!this.isPrecise())
 		this.preciseBox.hidden = true;
-	this.typeBox.addEventListener("command", this.selectByType, false);
+
+	this._precisePreset = 1;
 }
 
-gSanitizePromptDialog.selectByType = function(e)
+gSanitizePromptDialog.precisePreset = function(obj)
 {
-	// This method is the onselect handler for the duration dropdown.  As a
-	// result it's called a couple of times before onload calls init().
-	if (!gSanitizePromptDialog._inited || gSanitizePromptDialog.selectedTimespan !== Sanitizer.TIMESPAN_PRECISE)
+	if (!this._inited)
 		return;
 
-	gSanitizePromptDialog.preciseBoxShow(true);
+	var ts = parseInt(obj.value);
+	var endDate = Date.now();
+	var startDate, s;
+	switch (ts) {
+		case 0 : //now
+				startDate = new Date().valueOf();
+			break;
+		case Sanitizer.TIMESPAN_TODAY :
+				var d = new Date();	// Start with today
+				d.setHours(0);			// zero us back to midnight...
+				d.setMinutes(0);
+				d.setSeconds(0);
+				startDate = d.valueOf();
+			break;
+		case 105: //this month
+				var d = new Date();	// Start with today
+				d.setDate(1);				// zero us back to first of the month...
+				d.setHours(0);			// zero us back to midnight...
+				d.setMinutes(0);
+				d.setSeconds(0);
+				startDate = d.valueOf();
+			break;
+		default:
+				startDate = endDate - ts;
+			break;
+	}
+	switch(this.selectedTimespan)
+	{
+		case Sanitizer.TIMESPAN_PRECISE_BEFORE:
+				s = 1;
+			break;
+		case Sanitizer.TIMESPAN_PRECISE_AFTER:
+				s = 2;
+			break;
+		case Sanitizer.TIMESPAN_PRECISE_BETWEEN:
+				s = this._precisePreset ? 3 : 4;
+			break;
+	}
+	this.preciseShowDate(s, new Date(startDate));
 }
 
 gSanitizePromptDialog.preciseBoxShow = function(r)
 {
-	var type = parseInt(this.typeBox.value);
+	var type = this.selectedTimespan;
 	var sel = 0;
 	switch(type)
 	{
-		case 1:
-				document.getElementById("sanitizePreciseDateBox1").hidden = true;
-				document.getElementById("sanitizePreciseDateBox2").hidden = false;
-				sel = 1;
-			break;
-		case 2:
+		case Sanitizer.TIMESPAN_PRECISE_BEFORE:
 				document.getElementById("sanitizePreciseDateBox1").hidden = false;
 				document.getElementById("sanitizePreciseDateBox2").hidden = true;
+				document.getElementById("sanitizePreciseDateBox3").hidden = true;
+				document.getElementById("sanitizePreciseDateBox4").hidden = true;
 				sel = 1;
 			break;
-		case 3:
-		default:
-				document.getElementById("sanitizePreciseDateBox1").hidden = false;
+		case Sanitizer.TIMESPAN_PRECISE_AFTER:
+				document.getElementById("sanitizePreciseDateBox1").hidden = true;
 				document.getElementById("sanitizePreciseDateBox2").hidden = false;
+				document.getElementById("sanitizePreciseDateBox3").hidden = true;
+				document.getElementById("sanitizePreciseDateBox4").hidden = true;
+				sel = 1;
+			break;
+		case Sanitizer.TIMESPAN_PRECISE_BETWEEN:
+		default:
+				document.getElementById("sanitizePreciseDateBox1").hidden = true;
+				document.getElementById("sanitizePreciseDateBox2").hidden = true;
+				document.getElementById("sanitizePreciseDateBox3").hidden = false;
+				document.getElementById("sanitizePreciseDateBox4").hidden = false;
 				sel = 2;
 			break;
 	}
-	document.getElementById("sep").hidden = type != 3;
 	if (this.preciseBox.hidden)
 		this.preciseBox.hidden = false;
 
-	if (r && this._lastSelected != sel)
+	if (r && this._preciseLastSelected != sel)
 	{
 		window.sizeToContent();
 	}
-	this._lastSelected = this.selectedTimespan === Sanitizer.TIMESPAN_PRECISE ? sel : 0;
+	this._preciseLastSelected = this.isPrecise() ? sel : 0;
 
 	window.document.title =
-		window.document.documentElement.getAttribute("precisetitle");
+		document.getElementById("SanitizeDialogPane").getAttribute("precisetitle");
 }
 
-gSanitizePromptDialog.showDate = function(id, date)
+gSanitizePromptDialog.preciseShowDate = function(id, date)
 {
 	document.getElementById("sanitizePreciseDate"+id).dateValue = date;
 	document.getElementById("sanitizePreciseTime"+id).dateValue = date;
@@ -114,16 +183,13 @@ gSanitizePromptDialog.showDate = function(id, date)
 
 gSanitizePromptDialog.selectByTimespan = function()
 {
-	// This method is the onselect handler for the duration dropdown.  As a
-	// result it's called a couple of times before onload calls init().
 	if (!this._inited)
 		return;
 
 	var warningBox = this.warningBox;
 
-	if (this.selectedTimespan === Sanitizer.TIMESPAN_PRECISE)
+	if (this.isPrecise())
 	{
-
 		// If clearing a specific time range
 		if (!warningBox.hidden)
 		{
@@ -131,26 +197,37 @@ gSanitizePromptDialog.selectByTimespan = function()
 			warningBox.hidden = true;
 		}
 		this.preciseBoxShow(true);
-
 		return;
 	}
-	this._lastSelected = 0;		
+	this._preciseLastSelected = 0;
 	if (!this.preciseBox.hidden)
 	{
 		this.preciseBox.hidden = true;
 		window.sizeToContent();
 	}
-	this._selectByTimespan();
+	this.___selectByTimespan();
 }
 
-gSanitizePromptDialog.updatePrefs = function ()
+gSanitizePromptDialog.updatePrefs = function()
 {
-	this.prefs.setIntPref("type", parseInt(this.typeBox.value));
 	this.prefs.setCharPref("date1", Sanitizer.getDate(1).getTime()/1000);
 	this.prefs.setCharPref("date2", Sanitizer.getDate(2).getTime()/1000);
-	gSanitizePromptDialog._updatePrefs();
+	this.prefs.setCharPref("date3", Sanitizer.getDate(3).getTime()/1000);
+	this.prefs.setCharPref("date4", Sanitizer.getDate(4).getTime()/1000);
+	gSanitizePromptDialog.___updatePrefs();
 }
 
+gSanitizePromptDialog.sanitize = function()
+{
+	try
+	{
+		document.documentElement.getButton("accept").disabled = true;
+		document.documentElement.getButton("accept").label = document.getElementById("SanitizeDialogPane").getAttribute("precisewait");
+	}
+	catch (e) {}
+
+	return this.___sanitize();
+}
 Sanitizer.getDate = function(type)
 {
 	var date = document.getElementById("sanitizePreciseDate"+type).dateValue;
@@ -162,25 +239,25 @@ Sanitizer.getDate = function(type)
 Sanitizer.getClearRange = function (ts)
 {
 	if (ts === undefined)
-		ts = Sanitizer.prefs.getIntPref("timeSpan");
-	if (ts === Sanitizer.TIMESPAN_PRECISE)
+		ts = this.prefs.getIntPref("timeSpan");
+
+	if (gSanitizePromptDialog.isPrecise(ts))
 	{
 		var d1 = new Date();
 		var d2 = d1;
-		var type = parseInt(gSanitizePromptDialog.typeBox.value);
-		switch(type)
+		switch(ts)
 		{
-			case 1:
-					var d1 = 0;
-					var d2 = this.getDate(type);
+			case this.TIMESPAN_PRECISE_BEFORE:
+					d1 = 0;
+					d2 = this.getDate(1);
 				break;
-			case 2:
-					d1 = this.getDate(type);
-					d2 = 0;
+			case this.TIMESPAN_PRECISE_AFTER:
+					d2 = d1;
+					d1 = this.getDate(2);
 				break;
-			case 3:
-					d1 = this.getDate(1);
-					d2 = this.getDate(2);
+			case this.TIMESPAN_PRECISE_BETWEEN:
+					d1 = this.getDate(3);
+					d2 = this.getDate(4);
 					if (d2 < d1)
 					{
 						var d = d2;
@@ -191,5 +268,7 @@ Sanitizer.getClearRange = function (ts)
 		}
 		return [(d1.valueOf() * 1000), (d2.valueOf() * 1000)];
 	}
-	Sanitizer._getClearRange(ts);
+	this.___getClearRange(ts);
 }
+
+window.addEventListener("load", gSanitizePromptDialog.preciseLoad, false);
